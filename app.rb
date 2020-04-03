@@ -12,6 +12,19 @@ before do
   init_db
 end
 
+configure do
+	# инициализация БД
+	init_db
+
+	# создает таблицу если таблица не существует
+	@db.execute 'create table if not exists Posts
+	(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		created_date DATE,
+		content TEXT
+  )'
+  
+end
 
 get '/' do
   erb 'Can you handle a secret?'
