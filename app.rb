@@ -24,6 +24,15 @@ configure do
 		content TEXT
   )'
   
+  # создает таблицу если таблица не существует
+	@db.execute 'create table if not exists Comments
+	(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		created_date DATE,
+		content TEXT,
+		post_id integer
+	)'
+
 end
 
 get '/' do
@@ -67,4 +76,36 @@ get '/details/:post_id' do
 
 	# возвращаем представление details.erb
 	erb :details
+end
+
+
+# обработчик post-запроса /details/...
+# (браузер отправляет данные на сервер, мы их принимаем) 
+
+post '/details/:post_id' do
+
+	# получаем переменную из url'a
+	post_id = params[:post_id]
+
+	# получаем переменную из post-запроса
+	content = params[:content]	
+
+	# сохранение данных в БД
+
+	@db.execute 'insert into Comments
+		(
+			content,
+			created_date,
+			post_id
+		)
+			values
+		(
+			?,
+			datetime(),
+			?
+		)', [content, post_id]
+
+	# перенаправление на страницу поста
+
+	redirect to('/details/' + post_id)
 end
